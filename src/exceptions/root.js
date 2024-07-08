@@ -20,6 +20,7 @@ export class HttpException extends Error {
 
 export const ErrorCodes = {
   item_already_exist: 1001,
-  item_not_found: 1002,
+  bad_request: 1002,
+  item_not_found: 1003,
   validation_error: 2001,
 };
