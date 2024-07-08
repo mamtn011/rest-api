@@ -1,6 +1,6 @@
 import { prismaClient } from "../index.js";
 
-// check the data available or not by id
+// find the data  by id
 export const findDataById = async (collection, id) => {
   const data = await prismaClient[collection].findFirst({
     where: {
@@ -10,7 +10,7 @@ export const findDataById = async (collection, id) => {
   return data;
 };
 
-// check the data available or not by Field
+// find the data by Field
 export const findDataByField = async (collection, fieldName, fieldValue) => {
   const data = await prismaClient[collection].findFirst({
     where: {

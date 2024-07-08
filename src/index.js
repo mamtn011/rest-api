@@ -3,12 +3,14 @@ import { PORT } from "./secrets.js";
 import rootRouter from "./routes/index.js";
 import { PrismaClient } from "@prisma/client";
 import { errorMiddleware } from "./middlewares/error.js";
+import { requestLogger } from "./middlewares/log-request.js";
 const app = express();
 export const prismaClient = new PrismaClient({
   log: ["query"],
 });
 
 app.use(express.json());
+app.use(requestLogger);
 app.use("/api", rootRouter);
 
 app.use(errorMiddleware);
