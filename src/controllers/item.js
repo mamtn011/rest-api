@@ -1,27 +1,40 @@
 import { BadRequestException } from "../exceptions/bad-request.js";
 import { ErrorCodes } from "../exceptions/root.js";
+import { ValidationError } from "../exceptions/validation.js";
 import { prismaClient } from "../index.js";
+import { ItemSchema } from "../schema/item.js";
 import { findDataByField, findDataById } from "../utils/findData.js";
 
 // create item
 export const createItem = async (req, res, next) => {
-  const item = await findDataByField("item", "name", req?.body?.name);
-  if (item) {
+  const validate = ItemSchema.safeParse(req.body);
+  if (!validate.success) {
     next(
-      new BadRequestException(
-        "Item already added!",
-        ErrorCodes.item_already_exist
+      new ValidationError(
+        validate?.error,
+        "Unexpected entity!",
+        ErrorCodes.validation_error
       )
     );
   } else {
-    const newItem = await prismaClient.item.create({
-      data: req.body,
-    });
-    return res.json({
-      status: 200,
-      data: newItem,
-      message: "Item created.",
-    });
+    const item = await findDataByField("item", "name", req?.body?.name);
+    if (item) {
+      next(
+        new BadRequestException(
+          "Item already added!",
+          ErrorCodes.item_already_exist
+        )
+      );
+    } else {
+      const newItem = await prismaClient.item.create({
+        data: req.body,
+      });
+      return res.json({
+        status: 200,
+        data: newItem,
+        message: "Item created.",
+      });
+    }
   }
 };
 // get items
@@ -47,17 +60,28 @@ export const editItem = async (req, res, next) => {
   if (!item) {
     next(new BadRequestException("Item not found!", ErrorCodes.item_not_found));
   } else {
-    const editedItem = await prismaClient.item.update({
-      where: {
-        id,
-      },
-      data: req.body,
-    });
-    return res.json({
-      status: 200,
-      data: editedItem,
-      message: "Item updated.",
-    });
+    const validate = ItemSchema.safeParse(req.body);
+    if (!validate.success) {
+      next(
+        new ValidationError(
+          validate?.error,
+          "Unexpected entity!",
+          ErrorCodes.validation_error
+        )
+      );
+    } else {
+      const editedItem = await prismaClient.item.update({
+        where: {
+          id,
+        },
+        data: req.body,
+      });
+      return res.json({
+        status: 200,
+        data: editedItem,
+        message: "Item updated.",
+      });
+    }
   }
 };
 
