@@ -6,7 +6,7 @@ import { errorMiddleware } from "./middlewares/error.js";
 import { requestLogger } from "./middlewares/log-request.js";
 const app = express();
 export const prismaClient = new PrismaClient({
-  log: ["query"],
+  // log: ["query"],
 });
 
 app.use(express.json());

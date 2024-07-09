@@ -45,11 +45,15 @@ export const getItems = async (req, res, next) => {
   }
 };
 // get item
-export const getItem = async (req, res) => {
+export const getItem = async (req, res, next) => {
   try {
     const { id } = req.params;
     const item = await findDataById("item", id);
-    return res.json({ status: 200, data: item });
+    if (!item) {
+      next(new BadRequestException("Bad Request!", ErrorCodes.bad_request));
+    } else {
+      return res.json({ status: 200, data: item });
+    }
   } catch (err) {
     next(new BadRequestException("Bad Request!", ErrorCodes.bad_request));
   }
